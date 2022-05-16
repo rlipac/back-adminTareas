@@ -1,0 +1,5 @@
+.env
+.log .lock  .tmp.
+/bin /out  /target.
+/node_modules
+/.vscode

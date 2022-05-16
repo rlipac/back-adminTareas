@@ -1,0 +1,27 @@
+{
+  "name": "back-admintareas",
+  "version": "1.0.0",
+  "description": "backEnd de  administrador de tareas  ",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon  ./src/ index.js",
+    "start": "node ./src/ index.js"
+  },
+  "keywords": [
+    "MERN",
+    "Node"
+  ],
+  "author": "Richard lipa Cochachi",
+  "license": "MIT",
+  "dependencies": {
+    "bcrypt": "^5.0.1",
+    "dotenv": "^16.0.0",
+    "express": "^4.18.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^6.3.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.16"
+  }
+}
