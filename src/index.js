@@ -2,6 +2,10 @@
 import express from 'express'
 import dotenv from 'dotenv'// para cargar nuetras variables de entorno
 import conexionDB from './config/db.js';
+import cors from 'cors'
+
+
+//
 import usuarioRouters from './routes/usuarioRoutes.js'
 import proyectosRoutes from './routes/proyectosRoutes.js'
 import tareasRoutes from './routes/tareasRoutes.js'
@@ -15,6 +19,18 @@ app.use(express.json())// para que pueda leer el body
 dotenv.config() // para que cargue nuetras avriables de entorno
 
 conexionDB()
+
+// configuarion de cors
+ app.use(cors()) // Metodo  simple y basico cors
+
+
+// const corsOptions = {
+//     origin: 'http://localhost:3000/',
+//     optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+//   }
+
+// app.use(cors(corsOptions)) ; 
+
 
 // Routing
 app.use("/API/usuarios",  usuarioRouters);

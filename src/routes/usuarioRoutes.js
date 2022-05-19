@@ -19,9 +19,9 @@ const router = express.Router()
 router.get("/", listarUsuarios)
 router.post("/", registrar)
 router.post("/login", authenticar)
-router.get("/confirmar/:token", confirmar)
+router.get("/confirmar-cuenta/:token", confirmar)
 router.post("/reset-password", resetPassword)
-router.route("/reset-password/:token").get(comprobarToken).post(nuevoPassword)
+router.route("/reset-password/:id").get(comprobarToken).post(nuevoPassword)
 
 router.get("/perfil", checkAuth, perfil)
 
