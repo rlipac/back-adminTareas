@@ -2,7 +2,7 @@
 import Usuario from '../models/Usuario.js'
 import generarTokenId from '../helpers/generarTokenId.js';
 import generarJWT from '../helpers/generarJWT.js';
-import { emailRegistro } from '../helpers/email.js';
+import { emailRegistro, resetPassword } from '../helpers/email.js';
 
 
 
@@ -34,7 +34,7 @@ const registrar = async (req, res) => {
 
         res.json({
 
-            mensage: "Usuario registrado correactamente -revisa tu email para confirmar tu cuenta"
+            mensage: `Usuario ${email} registrado correactamente -revisa tu email para confirmar tu cuenta`
 
         })
 
@@ -113,7 +113,7 @@ const confirmar = async (req, res) => {
     res.end()
 }
 
-const resetPassword = async (req, res) => {
+const olvidePassword = async (req, res) => {
     const { email } = req.body;
     const usuario = await Usuario.findOne({ email })
     if (!usuario) {
@@ -123,9 +123,17 @@ const resetPassword = async (req, res) => {
     try {
         usuario.token = generarTokenId()
         await usuario.save()
+
+        // enviar email para crear nuevo password
+        resetPassword({
+            email: usuario.email,
+            nombre: usuario.nombre,
+            token: usuario.token
+        })
         res.json({
             token: usuario.token,
-            msg: "password reseteado",
+            msg: `Hola ${usuario.nombre} te enviamos un email con las intrucciones`,
+            usuario
 
         })
 
@@ -139,17 +147,15 @@ const resetPassword = async (req, res) => {
 
 const comprobarToken = async (req, res) => {
     const { token } = req.params;
-
     const tokenValido = await Usuario.findOne({ token })
-
     if (tokenValido) {
         res.json({
             tokenValido,
-            msg: "password reseteado"
+            msg: "token Valido"
         })
 
     } else {
-        const error = new Error(`token invalido`)
+        const error = new Error(`token invalido...`)
         return res.status(403).json({
 
             mensage: error.message
@@ -160,18 +166,19 @@ const comprobarToken = async (req, res) => {
 
 const nuevoPassword = async (req, res) => {
     const { token } = req.params;
-    const { claveNueva } = req.body;
+    console.log(req.params, '------>')
+    const { newPassword } = req.body;
 
     const usuario = await Usuario.findOne({ token });
 
     if (usuario) {
-        usuario.password = claveNueva;
+        usuario.password = newPassword;
         usuario.token = '';
         await usuario.save()
-        res.json({ usuario, msg: "Password Cambiado correctamente" })
+        res.json({  msg: "Password Cambiado correctamente" })
     } else {
         const error = new Error(`Error, token invalido`)
-        return res.status(403).json({ mensage: error.message })
+        return res.status(403).json({ msg: error.message })
     }
 }
 
@@ -192,7 +199,7 @@ export {
     registrar,
     authenticar,
     confirmar,
-    resetPassword,
+    olvidePassword,
     comprobarToken,
     nuevoPassword,
     perfil,
