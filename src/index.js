@@ -1,4 +1,4 @@
-// pprimero colocar esta linia en el ppakage.json despues de "descripcion" para poder utilizar import --  "type": "module",
+// primero colocar esta linia en el pakage.json despues de "descripcion" para poder utilizar import --  "type": "module",
 import express from 'express'
 import dotenv from 'dotenv'// para cargar nuetras variables de entorno
 import conexionDB from './config/db.js';

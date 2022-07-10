@@ -1,13 +1,16 @@
 import express from 'express'
 import { checkAuth } from '../middleware/atuthenticar.js'
 import { 
-         editarProyecto, 
+         editarProyecto,
+         obtenerProyectoId, 
          deleteProyectoCreadoPorUsuario,
-         addColaborador,
-         deleteColaborador,
          nuevoProyecto,
          listarProyectosPorUsuario,
-         obtenerProyectoYtareas} from '../controller/proyectoController.js'
+         obtenerProyectoYtareas,
+         addColaborador,
+         deleteColaborador,
+         searchColaborador
+        } from '../controller/proyectoController.js'
 
          const router = express.Router() // creammo un nueva instancia del router con la funcioon Router de expres
 
@@ -16,19 +19,22 @@ import {
            .route("/")
            .get(checkAuth, listarProyectosPorUsuario)
            .post(checkAuth, nuevoProyecto)
-
+ 
            
-      //   router.post("/add",checkAuth, nuevoProyecto)
+   router.post("/",checkAuth, nuevoProyecto)
 
         router
            .route("/:id")
            .get(checkAuth, obtenerProyectoYtareas)
+         //   .get(checkAuth, obtenerProyectoId)
            .put(checkAuth, editarProyecto)
            .delete(checkAuth, deleteProyectoCreadoPorUsuario)
 
       //  router.get("/tareas/:id", checkAuth, obtenerTareas)
-        router.post("/agregar-colaborador/:id", checkAuth, addColaborador)
-        router.post("/eliminar-colaborador/:id", checkAuth, deleteColaborador)   
+       // router.get("misproyectos/:id",checkAuth, obtenerProyectoYtareas)
+        router.post("/colaborador", checkAuth, searchColaborador)
+        router.post("/colaborador/:id", checkAuth, addColaborador)
+        router.delete("/colaborador/:id", checkAuth, deleteColaborador)   
  
          export default router;
 

@@ -21,7 +21,7 @@ import { actualizartarea,
     .put(checkAuth, actualizartarea)
     .delete(checkAuth, eliminarTarea)
 
-router.post("/estado/:id", checkAuth, cambiarEstadoTarea)   
+router.put("/estado/:id", checkAuth, cambiarEstadoTarea)   
 
    
 

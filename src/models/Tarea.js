@@ -13,15 +13,15 @@ const tareaSchema = mongoose.Schema({
     },
     estado:{
         type:Boolean,
-        default:false
+        default:false,
+        required: true
     },
     fechaEntrega:{
-        type:Date,
-        required:true,
-        default: Date.now()
+        type:Date
     },
     prioridad:{
-        type:String,
+        type:String, 
+        require:true,
         trim:true,
         enum:["Baja", "Media", "Alta"]
     },

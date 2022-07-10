@@ -13,7 +13,7 @@ const proyectosSchema = mongoose.Schema({
     },
     fechaEntrega:{
         type: Date,
-        default:Date.now()
+        
     },
     cliente:{
         type:String,
@@ -24,6 +24,11 @@ const proyectosSchema = mongoose.Schema({
         type:mongoose.Schema.Types.ObjectId, // id del creador
         ref: "Usuario", // Modelo Usuario
     },
+    tareas:[
+        { type: mongoose.Schema.Types.ObjectId,
+            ref:"Tarea" // aqui se  almacena el array de los id de las tareas
+        }
+    ],
     colaboradores: [ // es un array de objetos porque pueden aver varios colaboradores
         {
             type:mongoose.Schema.Types.ObjectId, // id del creador

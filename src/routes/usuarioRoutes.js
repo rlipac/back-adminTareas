@@ -1,5 +1,7 @@
-import express from "express";
+import  express,{request, response } from "express";
 import { checkAuth } from "../middleware/atuthenticar.js";
+
+const router = express.Router()
 import {
     authenticar,
     registrar,
@@ -8,21 +10,23 @@ import {
     comprobarToken,
     nuevoPassword,
     perfil,
-    listarUsuarios
+    listarUsuarios,
+    obtenerUsuario
     
 
 } from "../controller/usuarioController.js";
 
 
-const router = express.Router()
 
-router.get("/", listarUsuarios)
+
+router.get("/", checkAuth, listarUsuarios)
 router.post("/", registrar)
 router.post("/login", authenticar)
 router.get("/confirmar-cuenta/:token", confirmar)
 router.post("/olvide-password", olvidePassword)
 router.route("/nuevo-password/:token").get(comprobarToken).post(nuevoPassword)
+router.get('/:id', obtenerUsuario)
 
-router.get("/perfil", checkAuth, perfil)
+router.get("/perfil/ok", checkAuth, perfil)
 
 export default router

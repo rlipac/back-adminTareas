@@ -30,7 +30,7 @@ const UsuarioSchema = mongoose.Schema({
 ); // timestamps crea un cregistro de fecha de creado y actualizado
 
 //leer doc PRE // https://mongoosejs.com/docs/middleware.html#pre
-UsuarioSchema.pre('save', async function(next) {
+UsuarioSchema.pre('save', async function(next) { // se ejecuta antes de guardar usuarios
 
     // }
     if (!this.isModified('password')) return next();// si el password no ha sido modificado, seguir con el siguiente Midleware // si ya esta hasheado sigue de largo sino lo hashea
