@@ -1,3 +1,4 @@
-# API REST FULL (Proyecto adminTareas) con stack MERN
-    Para ejecutar  ejecute el comando  - npm install  
+## API REST FULL (Proyecto adminTareas) con stack MERN
+    ##### *Para instalar las dependencias  ejecutar el comando*  ** npm install ** 
+
    
