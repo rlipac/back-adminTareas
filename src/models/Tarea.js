@@ -17,7 +17,10 @@ const tareaSchema = mongoose.Schema({
         required: true
     },
     fechaEntrega:{
-        type:Date
+        type:Date,
+        defaul: Date.now(),
+        require:true
+       
     },
     prioridad:{
         type:String, 
@@ -29,7 +32,13 @@ const tareaSchema = mongoose.Schema({
          type:mongoose.Schema.Types.ObjectId, // id del proyecto asociado
          ref:"Proyecto" // Modelo     asociado
     
-    }
+    },
+    completado:{
+        type:mongoose.Schema.Types.ObjectId, // id del proyecto asociado
+        ref:"Usuario" // Modelo     asociado
+   
+   }
+
 },
 {
     timestamps:true

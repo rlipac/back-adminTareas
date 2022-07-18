@@ -12,7 +12,7 @@ const agregarTarea = async (req, res) => {
 
         const { proyecto } = req.body
         const idUsuario = req.usuario._id.toString();
-        console.log('id -> ',  proyecto,' ', idUsuario)
+       
 
         const proyectoExiste = await Proyecto.findById(proyecto).where('creador').equals(idUsuario)
         
@@ -42,7 +42,7 @@ const agregarTarea = async (req, res) => {
         }
 
         const tareaGuardada = await Tarea.create(req.body);
-        console.log("controller fecha entrega ==>",req.body.fechaEntrega);
+      
         res.status(200).json({
             tareaGuardada
         })
@@ -121,7 +121,7 @@ const eliminarTarea = async (req, res) => {
     try {
         const { id } = req.params
 
-        const tarea = await Tarea.findByIdAndDelete(id).populate('proyecto')
+        const tarea = await Tarea.findById(id).populate('proyecto')
                                             
 
         if (!tarea) {
@@ -133,7 +133,15 @@ const eliminarTarea = async (req, res) => {
             const error = new Error("No puede acceder a esta tarea, solicitela a su creador")
             return res.status(403).json({ msg: error.message })
         }
-           // await tarea.deleteOne()
+           
+        const proyecto = await Proyecto.findById(tarea.proyecto);
+        proyecto.tareas.pull(tarea._id) //quitamos la tarea de proyectos
+          
+       await Promise.allSettled([ // allSettled // ejecuta dos o mas promesas al mismo tiempo
+            await proyecto.save(),
+            await tarea.deleteOne()
+         ]) 
+       
            
             res.status(200).json({msg:"tarea eliminada correactamente", tarea })
     } catch (error) {
@@ -146,28 +154,27 @@ const eliminarTarea = async (req, res) => {
 }
 
 const cambiarEstadoTarea = async (req, res) => { 
-
-
+    console.log('cambiar estado --> ')
     try {
-        
         const { id } = req.params
-
-        const tarea = await Tarea.findById(id);
-                                            
-
+        const tarea = await Tarea.findById(id).populate('proyecto')       
         if (!tarea) {
             const error = new Error("Tarea no encontrada")
             return res.status(403).json({ msg: error.message })
         }
-
-        if (tarea.proyecto.creador.toString() !== req.usuario._id.toString()) {
+        if (tarea.proyecto.creador.toString() !== req.usuario._id.toString() && !tarea.proyecto.colaboradores.some(colaborador => 
+            colaborador._id.toString() === req.usuario._id.toString()) ) {
             const error = new Error("No puede acceder a esta tarea, solicitela a su creador")
             return res.status(403).json({ msg: error.message })
-        }
-          
-        tarea.estado = true;
-        const estadoTarea = await Tarea.findByIdAndUpdate({ new: true, estado:true});
-        res.status(200).json({ estadoTarea })
+        }  
+        tarea.estado = !tarea.estado;
+        tarea.completado = req.usuario._id;  
+         await tarea.save();// guarda los cambios
+        const tareaCompletada = await Tarea.findById(id).populate('proyecto') // develve la tarea con el populate de completado(nombre de usuario e email)
+                                                        .populate('completado', 'nombre email') 
+         res.status(200).json({ 
+            tareaCompletada
+          })      
     } catch (error) {
         return res.status(403).json({ msg: error })
     }

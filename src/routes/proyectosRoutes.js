@@ -1,6 +1,7 @@
 import express from 'express'
 import { checkAuth } from '../middleware/atuthenticar.js'
 import { 
+         eliminarColaborador,
          editarProyecto,
          obtenerProyectoId, 
          deleteProyectoCreadoPorUsuario,
@@ -8,7 +9,6 @@ import {
          listarProyectosPorUsuario,
          obtenerProyectoYtareas,
          addColaborador,
-         deleteColaborador,
          searchColaborador
         } from '../controller/proyectoController.js'
 
@@ -34,7 +34,8 @@ import {
        // router.get("misproyectos/:id",checkAuth, obtenerProyectoYtareas)
         router.post("/colaborador", checkAuth, searchColaborador)
         router.post("/colaborador/:id", checkAuth, addColaborador)
-        router.delete("/colaborador/:id", checkAuth, deleteColaborador)   
+        router.post("/eliminar-colaborador/:id", checkAuth, eliminarColaborador)
+      
  
-         export default router;
+ export default router;
 

@@ -6,9 +6,16 @@ import Usuario  from "../models/Usuario.js";
 const listarProyectosPorUsuario = async(req, res)=>{
     console.log('listarProyectosPorUsuario...')
      try {
-        const proyectos = await Proyecto.find().where("creador").equals(req.usuario)
+        const proyectos = await Proyecto.find({
+                                            $or:[
+                                                { colaboradores: { $in: req.usuario }},
+                                                { creador: { $in: req.usuario } },
+                                            ]
+                                        })
+                                        .populate('creador', 'nombre email')
+                                        .select('-tareas')
         if(proyectos == ''){
-            return res.status(203).json({ msg: `Tu lista de pproyectos esta vacia ${proyectos}`})
+            return res.status(203).json({ msg: `Tu lista de proyectos esta vacia ${proyectos}`})
         }
         //contar Usuarios
              let arrayProyectos =[];
@@ -16,12 +23,9 @@ const listarProyectosPorUsuario = async(req, res)=>{
                  arrayProyectos.push(proyecto)
              }
              const totalProyectos = arrayProyectos.length;
-        //fin contar categorias
-        console.log(proyectos)
+        //fin contar categorias  
          res.json({
              totalProyectos,
-             msg:"proyectos lista",
-             creador: req.usuario.nombre,
              proyectos
             })
            
@@ -58,49 +62,55 @@ const nuevoProyecto = async(req, res)=>{
 }
 const obtenerProyectoYtareas = async(req, res)=>{
 
-    console.log(' proyecto y Tareas....ok ')
+    console.log('obtener pproyecto ... ', req.params)
 
     try {   
-        console.log(req.usuario, req.params.id)
+      ///  console.log(req.usuario, '??',  req.params.id)
             
             const { id } = req.params
-            const proyecto = await Proyecto.findById(id).populate('creador', 'nombre email').populate('tareas')
+            const proyecto = await Proyecto.findById(id)
+                                           .populate({ path: "tareas", select: '-__v -updatedAt',
+                                                       populate: { path: "completado", select: "nombre email"}  // hacer populate  un elemento populate
+                                                    })
+                                           .populate('colaboradores', 'email nombre')
+                                           .select('-__v -createdAt -updatedAt')
             const idCreador = proyecto.creador._id.toString();
             const idUsuario = req.usuario._id.toString();
-            console.log(proyecto)
+            const idColaborador = proyecto.colaboradores;
+           // console.log('idColaborador --> ',idColaborador);
           
-            
+            //const idColaborador = proyecto.colaboradores.colaborador._id.toString()
+            console.log('proyecto -> ', proyecto, 'idCreador: ',idCreador, 'idUsuario', idUsuario, 'idColaborador --> ',idColaborador); //, 'id colaborador-->', idColaborador )
             if(!proyecto){   // verificando si existe proyecto
-            
+                console.log('proyecto no existe')
                 const error = new Error("Proyecto no encontrado")
                 return res.status(404).json({ msg: error.message})
-            
+                     
             }
-            if( idCreador !== idUsuario){   // solo modifica si el lo creo
-                const error = new Error("Accion no valida ")
-            
+
+             // No puede ver el proyecto si
+           //? no es el creador del proyecto
+           //? y Si  no es colaborador 
+            if( idCreador !== idUsuario && !proyecto.colaboradores.some(colaborador => 
+                colaborador._id.toString() === req.usuario._id.toString()) ){   // solo modifica si el lo creo
+               
                 return res.status(403).json({
-                        msg: error.message,
-                        
-                        })
+                    msg: 'accion no valida',
+                    
+                    })   
 
             }
-            const tareas = await Tarea.find().where("proyecto").equals(proyecto._id)
-            if(tareas.length == 0){
+            if(proyecto.tareas.length == 0){
                
              return res.status(201).json({  msg:`Todavia no tines tareas`, proyecto})
             }
-            // // console.log(proyecto, tareas)
-            
-            // const elProyecto = {
-            //     proyecto,
-            //     tareas
-            // } 
-    
+
             res.json({
                 proyecto,
                 
             })
+           
+           
     } catch (error) {
         return res.status(403).json({ msg:`${error}`})
     }
@@ -177,11 +187,13 @@ const deleteProyectoCreadoPorUsuario = async(req, res)=>{
 }
 
 const obtenerProyectoId = async(req, res)=>{
-    console.log(' Editar proyectoId...')
+    console.log(' Editar proyectoId populate colaboradores...')
 
     try {
         const { id } = req.params
-        const proyecto = await Proyecto.findById(id).populate('creador', 'nombre email') // rellena los datos del creador 
+        const proyecto = await Proyecto.findById(id)
+                                       .populate('creador', 'nombre email')
+                                       // rellena los datos del creador 
         if(!proyecto){   // verificando si existe proyecto
           
             const error = new Error("Proyecto no encontrado")
@@ -274,13 +286,49 @@ const addColaborador = async (req, res)=>{
 
 
 }
-const deleteColaborador = async(req, res)=>{
+const eliminarColaborador = async (req, res)=>{
+     console.log('deltecolaborador--> ', req.body);
+    
+        try {
+
+        const { id } = req.params;
+        const  {idColaborador} = req.body;
+        
+        const idUsuario = req.usuario.id.toString();
+            // bu8scamos proyecto
+            const proyecto = await Proyecto.findById(id);
+
+            if(!proyecto){
+                return res.status(400).json({
+                    msg:'Proyecto no exite'
+                })     
+            }
+            // convertimos a strign los nid para compararlos
+            // verificamos que el solo el creador del proyecot pueda agregar colavboradores
+            const idCreador = proyecto.creador.toString()
+            if(idUsuario !== idCreador){
+                
+                return  res.status(400).json({msg:'Solo el creador del Proyecto puede Eliminar al colaboradores'})
+            }
+        
+            // incluimos el colaborador al array caolaboradores del Proyecto
+            proyecto.colaboradores.pull(idColaborador);
+            // guardamos el proyecto
+            await proyecto.save()
+        res.status(200).json({ proyecto })
+
+        } catch (error) {
+            console.log(error)
+
+        }
 
 }
 
 
 
+
  export {
+ 
      listarProyectosPorUsuario,
      obtenerProyectoId,
      nuevoProyecto,
@@ -288,6 +336,6 @@ const deleteColaborador = async(req, res)=>{
      editarProyecto,
      deleteProyectoCreadoPorUsuario,
      addColaborador,
-     deleteColaborador,
+     eliminarColaborador,
      searchColaborador
  }
