@@ -40,7 +40,7 @@ const nuevoProyecto = async(req, res)=>{
 
    try {
         const { nombre } = req.body;
-        console.log(req.usuario)
+      //  console.log(req.usuario)
 
         const proyectoExiste= await Proyecto.findOne({ nombre: nombre })
 
@@ -52,7 +52,7 @@ const nuevoProyecto = async(req, res)=>{
         proyecto.creador = req.usuario._id;
         const proyectoAlmacenado = await proyecto.save()
         
-        console.log(proyectoAlmacenado)
+        // console.log(proyectoAlmacenado)
         res.json(proyectoAlmacenado)
         
    } catch (error) {
@@ -62,7 +62,7 @@ const nuevoProyecto = async(req, res)=>{
 }
 const obtenerProyectoYtareas = async(req, res)=>{
 
-    console.log('obtener pproyecto ... ', req.params)
+    console.log('obtener pproyecto ... ')
 
     try {   
       ///  console.log(req.usuario, '??',  req.params.id)
@@ -80,7 +80,7 @@ const obtenerProyectoYtareas = async(req, res)=>{
            // console.log('idColaborador --> ',idColaborador);
           
             //const idColaborador = proyecto.colaboradores.colaborador._id.toString()
-            console.log('proyecto -> ', proyecto, 'idCreador: ',idCreador, 'idUsuario', idUsuario, 'idColaborador --> ',idColaborador); //, 'id colaborador-->', idColaborador )
+           // console.log('proyecto -> ', proyecto, 'idCreador: ',idCreador, 'idUsuario', idUsuario, 'idColaborador --> ',idColaborador); //, 'id colaborador-->', idColaborador )
             if(!proyecto){   // verificando si existe proyecto
                 console.log('proyecto no existe')
                 const error = new Error("Proyecto no encontrado")
@@ -124,7 +124,7 @@ const editarProyecto = async(req, res)=>{
     console.log(' Editar proyecto...lipa')
     try{
         const { id } = req.params
-        console.log(req.params)
+      //  console.log(req.params)
         const proyecto = await Proyecto.findById(id)
        
         if(!proyecto){   // verificando si existe proyecto
@@ -199,7 +199,7 @@ const obtenerProyectoId = async(req, res)=>{
             const error = new Error("Proyecto no encontrado")
             return res.status(404).json({ msg: error.message})
         }
-        console.log(proyecto)
+        // console.log(proyecto)
         res.status(200).json( proyecto )
         
     } catch (error) {
@@ -233,9 +233,9 @@ const searchColaborador= async(req, res)=>{
 }
 
 const addColaborador = async (req, res)=>{
-    console.log('agergarColaborador.. ', req.params.id, 'mi id')
-    console.log('agergarColaborador -> Usuario.. ', req.usuario)
-    console.log('agergarColaborador -> colaborador..-> ', req.body.email)
+    // console.log('agergarColaborador.. ', req.params.id, 'mi id')
+    // console.log('agergarColaborador -> Usuario.. ', req.usuario)
+  //  console.log('agergarColaborador -> colaborador..-> ', req.body.email)
 
  try {  
         const emailColaborador = req.body.email; 
@@ -258,7 +258,7 @@ const addColaborador = async (req, res)=>{
         }
         // buscamos colaborador
         const colaborador = await Usuario.findOne({email: emailColaborador}).select('-__v -token -password -confirmado -createdAt -updatedAt');
-        console.log('son coalbodador encotntrado -->', colaborador)
+       // console.log('son coalbodador encotntrado -->', colaborador)
         if(!colaborador){
             return res.status(400).json({
                 msg:'Este usuario no exite'
@@ -287,7 +287,7 @@ const addColaborador = async (req, res)=>{
 
 }
 const eliminarColaborador = async (req, res)=>{
-     console.log('deltecolaborador--> ', req.body);
+     console.log('deltecolaborador--> ', );
     
         try {
 

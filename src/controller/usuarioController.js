@@ -13,7 +13,7 @@ const crearAdmin = async () => {
                 nombre:'ADMIN',
                 email:'usuario@admin.com',
                 password:'123456',
-                token:generarTokenId(), // llenamos el campo token del Modelo usuario
+                token:'', // llenamos el campo token del Modelo usuario
                 confirmado:true
             }
             const usuariExiste = await Usuario.findOne({ email: data.email })
@@ -111,13 +111,26 @@ const registrar = async (req, res) => {
 
     try {
         const { email } = req.body;
+        const isValidarEmail =(email)=>{
+            return  /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,4})+$/.test(email);
+               
+          }
+
+          isValidarEmail(email)
+    
+          if( isValidarEmail(email) === false){
+            console.log(`el email ${email} no es valido`)
+            return res.status(400).json({
+                msg: `el email ${email} no es valido`
+            })
+          }
 
         const usuariExiste = await Usuario.findOne({ email: email })
 
         if (usuariExiste) {
             const error = Error(`el email ${usuariExiste.email} ya esta registrado por el usuario ${usuariExiste.nombre}`);
             return res.status(400).json({
-                mensage: error.message
+                msg: error.message
             })
         }
         const usuario = new Usuario(req.body)
@@ -163,7 +176,7 @@ const confirmar = async (req, res) => {
         usuarioComfirmado.confirmado = true;
         usuarioComfirmado.token = "";
         await usuarioComfirmado.save();
-        console.log(usuarioComfirmado)
+        //console.log(usuarioComfirmado)
         return res.status(200).json({
 
             msg: `Felicitaciones ${usuarioComfirmado.nombre} has confirmado correctamente...!!!`
@@ -213,7 +226,7 @@ const olvidePassword = async (req, res) => {
     
     try {
         const { email } = req.body;
-        console.log(email, '---mi email')
+       // console.log(email, '---mi email')
         const usuario = await Usuario.findOne({ email })
         if (!usuario) {
         const error = new Error("Usuario No existe")
@@ -249,11 +262,11 @@ const nuevoPassword = async (req, res) => {
     try {
         console.log('Nuevo password...')
         const { token } = req.params;
-        console.log(req.params,req.body, '------>')
+       
         const { newPassword } = req.body;
 
         const usuario = await Usuario.findOne({ token:`${token}` });
-        console.log(usuario)
+     //   console.log(usuario)
         if (!usuario) {
             const error = new Error(`Error, token invalido`)
             return res.status(403).json({ msg: error.message })
@@ -290,9 +303,10 @@ const perfil = (req, res) => {
     console.log('perfill....')
   try {
      const { usuario } = req;
-     console.log(' ==>  ',req.usuario)
+     //console.log(' ==>  ',req.usuario)
      return res.status(200).json(usuario)
   } catch (error) {
+    console.log('--> ',error)
     return res.status(400).json({
         msg:error
     })

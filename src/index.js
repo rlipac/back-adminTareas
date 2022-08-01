@@ -25,23 +25,26 @@ dotenv.config() // para que cargue nuetras avriables de entorno
 conexionDB()
 
 // configuarion de cors
-// app.use(cors()) // Metodo  simple y basico cors
+ app.use(cors()) // Metodo  simple y basico cors
 
-const whiteList =[process.env.FRONTEND_URL] // url servidor Front
- // cor con optionps
-const corsOptions = {
-    origin: function(origin, callback){
-        if(whiteList.includes(origin)){
-            // puede consultar la API
-            callback(null, true);
-        }else{
-            // no esa Autorizado 
-            callback( new Error("error en cors"));
-        }
-    }
-  }
+//? Cor con optionps
 
-app.use(cors(corsOptions)) ; 
+
+/// cor ejemplo solo admite solicitudes a la lista blanca
+
+// const  whiteList =[process.env.FRONTEND_URL]
+// const corsOptions = {
+//   origin: function (origin, callback) {
+//     if (whiteList.indexOf(origin) !== -1) {
+//       callback(null, true)
+//     } else {
+//       callback(new Error('Not allowed by CORS'))
+//     }
+//   }
+// }
+ 
+
+///fin ejemplo
 
 
 // Routing
@@ -70,19 +73,45 @@ try {
 
 io.on("connection", (socket) => {
   console.log('soket  -> se concto con el front')
-    
-//  socket.on('hola', (proyectos)=>{
-//     console.log('el fron me saludo otra vez ', proyectos );
 
-//     socket.emit('respuesta')
-//  }) 
 
-    socket.on('abrir proyecto', (proyecto)=>{
-        console.log('id del proyecto s.io ', proyecto)
-        socket.join(proyecto);
+    socket.on('abrir proyecto', (id)=>{
+       socket.join(id);// entra a la sala
 
-        socket.to('62d5b93f22377d990127ba6a').emit('respuesta', { nombre: 'richard Lipa'})
-    })
+        // socket.to(id).emit("respuesta", {nombre:' Richard', id:id } );
+
+       
+    });
+
+    socket.on('nueva tarea', (tarea)=>{ //
+        const idProyecto = tarea.proyecto; // obtenemos elid del proyecto
+       socket.to(idProyecto).emit('tarea agregada', tarea);// recibimos el id y devolvemos la tarea al front
+   })  
+
+   socket.on('eliminar tarea', (tarea)=>{
+    const idProyecto = tarea.proyecto; // obtenemos elid del proyecto
+    socket.to(idProyecto).emit('tarea eliminada', tarea)
+   })
+
+   socket.on('editar tarea', (tarea)=>{
+  
+    const idProyecto = tarea.proyecto._id; // obtenemos elid del proyecto
+    socket.to(idProyecto).emit('tarea actualizada', tarea)
+   })
+
+
+   socket.on('cambiar estado', (tarea)=>{
+  
+    const idProyecto = tarea.proyecto._id; // obtenemos elid del proyecto
+    socket.to(idProyecto).emit('estado actualizado', tarea)
+   })
+   socket.on('agregar colaborador', (proyecto)=>{
+        const idColaborador = proyecto.colaborador._id;
+        socket.to(idColaborador).emit('proyecto asignado', proyecto)
+
+   })
+
+   
 
 });
     

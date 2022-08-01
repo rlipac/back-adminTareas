@@ -7,7 +7,7 @@ import Tarea from "../models/Tarea.js";
 
 const agregarTarea = async (req, res) => {
 
-    console.log('save tarea => ', req.body);
+    console.log('save tarea => ');
     try {
 
         const { proyecto } = req.body
@@ -17,7 +17,7 @@ const agregarTarea = async (req, res) => {
         const proyectoExiste = await Proyecto.findById(proyecto).where('creador').equals(idUsuario)
         
         const creadorId = proyectoExiste.creador.toString();
-        console.log('proyecto existe -> ',proyectoExiste)
+       // console.log('proyecto existe -> ',proyectoExiste)
       
 
         if (!proyectoExiste) {
